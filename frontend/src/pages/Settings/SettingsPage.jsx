@@ -1,21 +1,15 @@
 import React, {useDispatch, useSelector} from "react-redux";
 import {useState, useEffect} from "react";
-import {Switch, createStyles, Theme} from "@material-ui/core";
+import {Switch} from "@material-ui/core";
 import {withStyles} from "@material-ui/core/styles";
 
 import {
-  CustomSwitch,
-  StyledBox,
   StyledIcon,
-  StyledSectionSettings,
   StyledButtonSettings2,
   StyledButtonSettings,
-  StyledInputFieldSettings,
   StyledFormSettings,
-  StyledH1Settings,
   StyledH2Settings,
   StyledBoxContainer,
-  StyledSwitchSettings,
   StyledBoxContainer2,
 } from "./StyledSettingsComponent";
 import {logoutUser} from "../../features/authSlice";
