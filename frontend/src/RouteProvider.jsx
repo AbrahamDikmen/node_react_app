@@ -1,27 +1,35 @@
 import React from "react";
 import {BrowserRouter, Routes, Route} from "react-router-dom";
 
-import RegisterPage from "./pages/RegisterPage/RegisterPage.jsx";
-import LoginPage from "./pages/loginPage/LoginPage.jsx";
-import HomePage from "./pages/homePage/HomePage.jsx";
-import NotFoundPage from "./pages/notFound/NotFoundPage.jsx";
-import SettingsPage from "./pages/Settings/SettingsPage";
+import RegisterPage from "./pages/RegisterPage.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
+import HomePage from "./pages/HomePage.jsx";
+import NotFoundPage from "./pages/NotFoundPage.jsx";
+import SettingsPage from "./pages/SettingsPage";
 
-import ForgottenPasswordPage from "./pages/ForgottenPasswordPage/ForgottenPasswordPage.jsx";
-import PasswordReset from "./pages/ForgottenPasswordPage/PasswordReset";
-import EmailVerify from "./pages/EmailVerify/EmailVerify.jsx";
+import ForgottenPasswordPage from "./pages/ForgottenPasswordPage.jsx";
+import PasswordReset from "./pages/PasswordReset";
+import EmailVerify from "./pages/EmailVerify.jsx";
 
-import AccountPage from "./pages/Settings/Account/AccountPage.jsx";
+import AccountPage from "./pages/AccountPage.jsx";
+import SetAvatarPage from "./pages/SetAvatarPage";
+import ChatPage from "./pages/ChatPage.jsx";
+
+import TestStyledPage from "./pages/TestStyledPage.jsx";
 
 const RouteProvider = () => {
   return (
     <div>
       <BrowserRouter>
         <Routes>
-          {/* Register, Login, Home*/}
+          <Route path="/test" element={<TestStyledPage />} />
+
+          {/* Register, Login, Home, SetAvatar */}
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/" exact element={<HomePage />} />
+          <Route path="/setavatar" element={<SetAvatarPage />} />
+          <Route path="/chat" element={<ChatPage />} />
 
           {/* Forgot Password, Find User, Reset Password*/}
           <Route path="/users/:id/verify/:token" element={<EmailVerify />} />

@@ -1,5 +1,6 @@
 import {createSlice, createAsyncThunk} from "@reduxjs/toolkit";
 import axios from "axios";
+
 import jwtDecode from "jwt-decode";
 
 const initialState = {
@@ -7,12 +8,11 @@ const initialState = {
   name: "",
   email: "",
   _id: "",
+
   registerStatus: "",
   registerError: "",
   loginStatus: "",
   loginError: "",
-  forgottenPasswordStatus: "",
-  forgottenPasswordError: "",
   userLoaded: false,
 };
 
@@ -20,7 +20,7 @@ export const registerUser = createAsyncThunk(
   "auth/registerUser",
   async (user, {rejectWithValue}) => {
     try {
-      const token = await axios.post(`/register`, {
+      const token = await axios.post("/api/register", {
         name: user.name,
         email: user.email,
         password: user.password,
@@ -40,27 +40,11 @@ export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async (user, {rejectWithValue}) => {
     try {
-      const token = await axios.post(`/login`, {
+      const token = await axios.post(`/api/auth/login`, {
         name: user.name,
         password: user.password,
       });
-      localStorage.setItem("token", token.data);
 
-      return token.data;
-    } catch (err) {
-      console.log(err.response.data);
-      return rejectWithValue(err.response.data);
-    }
-  }
-);
-
-export const passwordResetUser = createAsyncThunk(
-  "auth/passwordResetUser",
-  async (user, {rejectWithValue}) => {
-    try {
-      const token = await axios.post(`/password-reset"`, {
-        email: user.email,
-      });
       localStorage.setItem("token", token.data);
 
       return token.data;
@@ -91,21 +75,24 @@ const authSlice = createSlice({
         };
       }
     },
-    logoutUser(state, action) {
+    async logoutUser(state, action) {
       localStorage.removeItem("token");
 
-      return {
-        ...state,
-        token: "",
-        name: "",
-        email: "",
-        _id: "",
-        registerStatus: "",
-        registerError: "",
-        loginStatus: "",
-        loginError: "",
-        userLoaded: false,
-      };
+      await axios.post("/api/auth/logOut").then((response) => {
+        return {
+          response,
+          ...state,
+          token: "",
+          name: "",
+          email: "",
+          _id: "",
+          registerStatus: "",
+          registerError: "",
+          loginStatus: "",
+          loginError: "",
+          userLoaded: false,
+        };
+      });
     },
   },
   extraReducers: (builder) => {
@@ -156,30 +143,6 @@ const authSlice = createSlice({
         ...state,
         loginStatus: "rejected",
         loginError: action.payload,
-      };
-    });
-
-    // forgotten password
-    builder.addCase(passwordResetUser.pending, (state, action) => {
-      return {...state, forgottenPasswordStatus: "pending"};
-    });
-    builder.addCase(passwordResetUser.fulfilled, (state, action) => {
-      if (action.payload) {
-        const user = jwtDecode(action.payload);
-        return {
-          ...state,
-          token: action.payload,
-          email: user.email,
-          _id: user._id,
-          forgottenPasswordStatus: "success",
-        };
-      } else return state;
-    });
-    builder.addCase(passwordResetUser.rejected, (state, action) => {
-      return {
-        ...state,
-        forgottenPasswordStatus: "rejected",
-        forgottenPasswordError: action.payload,
       };
     });
   },

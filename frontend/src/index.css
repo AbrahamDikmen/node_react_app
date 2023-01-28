@@ -1,67 +1,19 @@
+@import url("https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@100;200;300;400;500&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body,
+button,
+span,
+input {
+  font-family: "Josefin Sans", sans-serif;
+}
+
 body {
-  height: 100vh;
-  background: linear-gradient(45deg, rgb(104, 102, 190), transparent),
-    repeating-linear-gradient(
-      45deg,
-      rgb(300, 0, 255) 0%,
-      rgb(183, 0, 255) 5%,
-      transparent 5%,
-      transparent 10%
-    ),
-    rgb(216, 118, 255)
-      repeating-linear-gradient(
-        -45deg,
-        rgba(183, 0, 255, 1) 0%,
-        rgba(183, 0, 255, 1) 5%,
-        transparent 5%,
-        transparent 10%
-      );
+  background-color: #131324;
   overflow: hidden;
-}
-.card {
-  position: relative;
-  padding: 5px;
-}
-
-.card .front {
-  transform: rotateY(90deg);
-  position: absolute;
-  transition: all ease-in 0.2s;
-}
-.flipped .front {
-  transform: rotateY(0deg);
-  transition-delay: 0.2s;
-}
-.card .back {
-  transition: all ease-in 0.2s;
-  transition-delay: 0.2s;
-}
-
-.flipped .back {
-  transition-delay: 0s;
-  transform: rotateY(90deg);
-}
-
-.back {
-  height: 100px;
-  display: block;
-  border: 2px solid #fff;
-  border-radius: 6px;
-  width: 100px;
-}
-
-.front {
-  height: 100px;
-  width: 100px;
-  display: block;
-  border: 2px solid #fff;
-  border-radius: 6px;
-}
-
-.card-grid {
-  margin-top: 40px;
-  display: grid;
-  padding: 20px;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  background-color: #0000ff;
 }
