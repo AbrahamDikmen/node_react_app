@@ -1,21 +1,25 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const register = require("./api/register");
 const bodyParser = require("body-parser");
-const login = require("./api/login");
-const passwordReset = require("./api/passwordReset");
+const cookieParser = require("cookie-parser");
+const routes = require("./routes/routes");
 
 // Sett up express app
+
 const app = express();
+
 require("dotenv").config();
+
+const server = require("http").createServer(app);
+const io = require("socket.io")(server, {
+  cors: {orgin: "*"},
+});
 
 // Initialize routess
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
-app.use("/register", register);
-app.use("/login", login);
-app.use("/password-reset", passwordReset);
+app.use("/api", routes());
 
 // error handling middleware
 app.use((err, req, res, next) => {
@@ -38,4 +42,19 @@ connection.once("open", () => {
 
 // Listen to port
 const port = process.env.PORT || 8080;
-app.listen(port, () => console.log(`Listning to port ${port}`));
+server.listen(port, () => console.log(`Listning to port ${port}`));
+
+global.onlineUsers = new Map();
+io.on("connection", (socket) => {
+  global.chatSocket = socket;
+  socket.on("add-user", (userId) => {
+    onlineUsers.set(userId, socket.id);
+  });
+
+  socket.on("send-msg", (data) => {
+    const sendUserSocket = onlineUsers.get(data.to);
+    if (sendUserSocket) {
+      socket.to(sendUserSocket).emit("msg-recieve", data.msg);
+    }
+  });
+});

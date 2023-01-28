@@ -1,5 +1,5 @@
 const express = require("express");
-const model = require("../models/model");
+const model = require("../models/User");
 const bcrypt = require("bcrypt");
 const Joi = require("joi");
 const genAuthToken = require("../utils/genAuthToken");
@@ -16,8 +16,12 @@ router.get("/", async (req, res, next) => {
 // Add a new users to the db
 router.post("/", async (req, res) => {
   // Schema for register user
+  const pattern =
+    /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
 
   const schema = Joi.object({
+    name: Joi.string().min(5).max(25).required().label("Name field"),
+
     email: Joi.string()
       .min(5)
       .max(200)
@@ -25,8 +29,10 @@ router.post("/", async (req, res) => {
       .email()
       .label("Email is required"),
 
-    name: Joi.string().min(5).max(25).required().label("Name field"),
-    password: Joi.string().min(5).max(200).required(),
+    password: Joi.string().min(8).regex(RegExp(pattern)).required().messages({
+      "string.pattern.base": "",
+      "string.min": "",
+    }),
 
     repeat_password: Joi.any()
       .equal(Joi.ref("password"))
@@ -40,13 +46,15 @@ router.post("/", async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   // Check through usernames and emails if the names already exists
-  let user = await model.findOne({email: req.body.email});
-  let userName = await model.findOne({name: req.body.name});
 
-  if (userName)
+  let email = await model.findOne({email: req.body.email});
+  let user = await model.findOne({name: req.body.name});
+
+  if (user)
     return res.status(400).send("Username already exist..try another one");
 
-  if (user) return res.status(400).send("Email already exist..try another one");
+  if (email)
+    return res.status(400).send("Email already exist..try another one");
 
   // Create new user model
   user = new model({
@@ -65,6 +73,7 @@ router.post("/", async (req, res) => {
   user = await user.save();
 
   // Generate token for the registred user
+
   const token = genAuthToken(user);
 
   res.send(token);

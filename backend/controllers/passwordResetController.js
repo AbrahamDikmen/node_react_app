@@ -1,6 +1,6 @@
 require("dotenv").config();
 const router = require("express").Router();
-const model = require("../models/model");
+const model = require("../models/User");
 const Token = require("../models/token");
 const crypto = require("crypto");
 const sendEmail = require("../utils/sendEmail");
@@ -14,6 +14,7 @@ router.post("/", async (req, res) => {
     const emailSchema = Joi.object({
       email: Joi.string().email().required().label("Email"),
     });
+
     const {error} = emailSchema.validate(req.body);
     if (error) return res.status(400).send({message: error.details[0].message});
 

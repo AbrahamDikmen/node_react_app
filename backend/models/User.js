@@ -6,28 +6,40 @@ const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    minlength: 5,
-    maxlength: 25,
+    minlength: 8,
+    maxlength: 20,
     unique: true,
   },
   email: {
     type: String,
     required: true,
-    minlength: 5,
-    maxlength: 200,
+    maxlength: 50,
     unique: true,
   },
 
   password: {
     type: String,
     required: true,
-    minlength: 5,
-    maxlength: 200,
+    minlength: 8,
   },
   repeat_password: {
     type: String,
     required: true,
   },
+  isAvatarImageSet: {
+    type: Boolean,
+    default: false,
+  },
+  avatarImage: {
+    type: String,
+    default: "",
+  },
+  roles: [
+    {
+      type: String,
+      default: "Employee",
+    },
+  ],
 });
 
 userSchema.methods.generateAuthToken = function () {
