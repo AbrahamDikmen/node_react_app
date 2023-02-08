@@ -12,12 +12,9 @@ const LoginPage = () => {
 
   console.log(auth);
   useEffect(() => {
-    const loadData = async () => {
-      if (auth._id) {
-        navigate("/");
-      }
-    };
-    loadData();
+    if (auth._id) {
+      navigate("/");
+    }
   }, [auth._id, navigate]);
 
   const [user, setUser] = useState({

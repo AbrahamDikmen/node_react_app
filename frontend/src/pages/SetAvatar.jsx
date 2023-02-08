@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import styled from "styled-components";
 import axios from "axios";
 import {Buffer} from "buffer";
-import {useDispatch, useSelector} from "react-redux";
+import {useSelector} from "react-redux";
 import {ToastContainer, toast} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {useNavigate} from "react-router-dom";
@@ -10,7 +10,6 @@ import {useNavigate} from "react-router-dom";
 import loader from "../assets/logos/loader.gif";
 
 export const SetAvatarPage = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const auth = useSelector((state) => state.auth);
   const api = "https://api.multiavatar.com/456785";

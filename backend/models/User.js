@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
-
+const {roles} = require("../utils/constants");
 // Create user Schema & model
 const userSchema = new mongoose.Schema({
   name: {
@@ -34,20 +34,14 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
-  roles: [
-    {
-      type: String,
-      default: "Employee",
-    },
-  ],
+  role: {
+    type: String,
+    enum: [roles.admin, roles.moderator, roles.client],
+    default: roles.client,
+  },
 });
 
-userSchema.methods.generateAuthToken = function () {
-  const token = jwt.sign({_id: this._id}, process.env.JWTPRIVATEKEY, {
-    expiresIn: "7d",
-  });
-  return token;
-};
+
 
 const model = mongoose.model("user", userSchema);
 module.exports = model;

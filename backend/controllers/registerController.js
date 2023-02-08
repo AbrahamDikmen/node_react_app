@@ -2,16 +2,9 @@ const express = require("express");
 const model = require("../models/User");
 const bcrypt = require("bcrypt");
 const Joi = require("joi");
-const genAuthToken = require("../utils/genAuthToken");
-
+const {roles} = require("../utils/constants");
 const router = express.Router();
 require("dotenv").config();
-
-// Get a list of users from the db
-router.get("/", async (req, res, next) => {
-  let doc = await model.find();
-  res.json(doc);
-});
 
 // Add a new users to the db
 router.post("/", async (req, res) => {
@@ -20,11 +13,11 @@ router.post("/", async (req, res) => {
     /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
 
   const schema = Joi.object({
-    name: Joi.string().min(5).max(25).required().label("Name field"),
+    name: Joi.string().min(8).max(20).required().label("Name field"),
 
     email: Joi.string()
-      .min(5)
-      .max(200)
+
+      .max(40)
       .required("Password is required")
       .email()
       .label("Email is required"),
@@ -47,9 +40,9 @@ router.post("/", async (req, res) => {
 
   // Check through usernames and emails if the names already exists
 
-  let email = await model.findOne({email: req.body.email});
   let user = await model.findOne({name: req.body.name});
-
+  let email = await model.findOne({email: req.body.email});
+  let adminCheck = req.body.email;
   if (user)
     return res.status(400).send("Username already exist..try another one");
 
@@ -68,15 +61,16 @@ router.post("/", async (req, res) => {
 
   // Hash password ( Protection against hackers for the database )
   user.password = await bcrypt.hash(user.password, salt);
-
   user.repeat_password = await bcrypt.hash(user.repeat_password, salt);
+  if (adminCheck === process.env.ADMIN_EMAIL.toLocaleLowerCase()) {
+    user.role = roles.admin;
+  }
+
   user = await user.save();
 
   // Generate token for the registred user
 
-  const token = genAuthToken(user);
-
-  res.send(token);
+  res.send(user);
 });
 
 // Update a users in the db

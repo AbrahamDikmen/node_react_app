@@ -8,7 +8,6 @@ const initialState = {
   name: "",
   email: "",
   _id: "",
-
   registerStatus: "",
   registerError: "",
   loginStatus: "",
@@ -20,15 +19,12 @@ export const registerUser = createAsyncThunk(
   "auth/registerUser",
   async (user, {rejectWithValue}) => {
     try {
-      const token = await axios.post("/api/register", {
+      await axios.post("/api/register", {
         name: user.name,
         email: user.email,
         password: user.password,
         repeat_password: user.repeat_password,
       });
-      localStorage.setItem("token", token.data);
-
-      return token.data;
     } catch (err) {
       console.log(err.response.data);
       return rejectWithValue(err.response.data);
@@ -101,24 +97,16 @@ const authSlice = createSlice({
       return {...state, registerStatus: "pending"};
     });
     builder.addCase(registerUser.fulfilled, (state, action) => {
-      if (action.payload) {
-        const user = jwtDecode(action.payload);
-        return {
-          ...state,
-          token: action.payload,
-          name: user.name,
-          email: user.email,
-          _id: user._id,
-          registerStatus: "success",
-        };
-      } else return state;
+      return {...state, userLoaded: false, registerStatus: "success"};
     });
     builder.addCase(registerUser.rejected, (state, action) => {
-      return {
-        ...state,
-        registerStatus: "rejected",
-        registerError: action.payload,
-      };
+      if (action.payload) {
+        return {
+          ...state,
+          registerStatus: "rejected",
+          registerError: action.payload,
+        };
+      } else return state;
     });
 
     // Login user
@@ -134,7 +122,7 @@ const authSlice = createSlice({
           name: user.name,
           email: user.email,
           _id: user._id,
-          registerStatus: "success",
+          loginStatus: "success",
         };
       } else return state;
     });

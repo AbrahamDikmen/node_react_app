@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from "react";
 import {HomeContainer} from "../components/ui/StyledHome";
 import {useSelector} from "react-redux";
-import {useNavigate, navigate} from "react-router";
-
+import {useNavigate} from "react-router";
+import FriendList from "./FriendList";
 import axios from "axios";
 
 const HomePage = () => {
@@ -10,18 +10,7 @@ const HomePage = () => {
   const [currentUserImage, setCurrentUserImage] = useState("");
   const auth = useSelector((state) => state.auth);
   const navigate = useNavigate();
-  console.log(auth);
-
-  useEffect(() => {
-    const loadData = async () => {
-      const data = await axios.get(`/api/setavatar/${auth._id}`);
-      console.log(data);
-      if (!data) {
-        navigate("/setavatar");
-      }
-    };
-    loadData();
-  }, [auth._id, navigate]);
+  console.log(auth.token);
 
   const forceLogout = useEffect(() => {
     if (!auth._id) {
@@ -33,12 +22,15 @@ const HomePage = () => {
     const loadData = async () => {
       await axios.get(`/api/setavatar/${auth._id}`).then((response) => {
         const data = response.data;
+        if (!data.isAvatarImageSet) {
+          navigate("/setAvatar");
+        }
         setCurrentUserName(data.name);
         setCurrentUserImage(data.avatarImage);
       });
     };
     loadData();
-  }, [auth._id]);
+  }, [auth._id, navigate]);
   return (
     <>
       {currentUserImage && currentUserName && (
@@ -54,6 +46,7 @@ const HomePage = () => {
             </div>
 
             <button onClick={() => navigate("/chat")}>Start Chat</button>
+            <button onClick={() => navigate("/friendList")}>Friend List</button>
 
             {auth._id ? "" : forceLogout}
 

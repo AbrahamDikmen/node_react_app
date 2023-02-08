@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 const Joi = require("joi");
 const genAuthToken = require("../utils/genAuthToken");
 const dayjs = require("dayjs");
-
+const {roles} = require("../utils/constants");
 const router = express.Router();
 
 router.post("/login", async (req, res) => {
@@ -30,7 +30,7 @@ router.post("/login", async (req, res) => {
   // Generate token
 
   const token = genAuthToken(user);
-  res.cookie("api-auth", token, {
+  res.cookie("access_token", token, {
     secure: false,
     httpOnly: true,
     expires: dayjs().add(7, "days").toDate(),
@@ -40,7 +40,7 @@ router.post("/login", async (req, res) => {
 
 router.post("/logOut", async (req, res) => {
   // Set token to none and expire after 5 seconds
-  res.cookie("api-auth", "none", {
+  res.cookie("access_token", "none", {
     expires: new Date(Date.now() + 5 * 1000),
     httpOnly: true,
   });
@@ -48,4 +48,5 @@ router.post("/logOut", async (req, res) => {
     .status(200)
     .json({success: true, message: "User logged out successfully"});
 });
+
 module.exports = router;

@@ -11,11 +11,6 @@ const RegisterPage = () => {
 
   console.log(auth);
 
-  useEffect(() => {
-    if (auth._id) {
-      navigate("/setavatar");
-    }
-  }, [auth._id, navigate]);
   const [meter, setMeter] = useState(false);
 
   const [user, setUser] = useState({
@@ -47,7 +42,9 @@ const RegisterPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    dispatch(registerUser(user));
+    if (dispatch(registerUser(user))) {
+      navigate("/login");
+    }
   };
 
   return (

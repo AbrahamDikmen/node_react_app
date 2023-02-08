@@ -5,7 +5,7 @@ import ChatInput from "./ChatInput";
 import {logoutUser} from "../features/authSlice";
 import {v4 as uuidv4} from "uuid";
 import axios from "axios";
-
+import HomePage from "../pages/HomePage";
 import {useNavigate} from "react-router";
 
 export default function ChatContainer({currentChat, socket}) {
@@ -84,11 +84,6 @@ export default function ChatContainer({currentChat, socket}) {
     scrollRef.current?.scrollIntoView({behavior: "smooth"});
   }, [messages]);
 
-  const forceLogout = useEffect(() => {
-    if (!auth._id) {
-      navigate("/login");
-    }
-  }, [auth._id, navigate]);
   return (
     <Container>
       <div className="chat-header">
@@ -99,22 +94,14 @@ export default function ChatContainer({currentChat, socket}) {
               alt=""
             />
           </div>
+
           <div className="username">
             <h3>{currentChat.name}</h3>
           </div>
+          <button onClick={() => navigate("/login")}>Home</button>
         </div>
-        {auth._id ? (
-          <button
-            onClick={() => {
-              dispatch(logoutUser(null));
-            }}
-          >
-            Logout
-          </button>
-        ) : (
-          forceLogout
-        )}
       </div>
+
       <div className="chat-messages">
         {messages.map((message) => {
           return (
@@ -140,20 +127,24 @@ export default function ChatContainer({currentChat, socket}) {
 
 const Container = styled.div`
   display: grid;
-  grid-template-rows: 10% 78% 12%;
-  gap: 0.1rem;
+  grid-template-rows: 10% 80% 10%;
   overflow: hidden;
+  gap: 0.1rem;
+  @media screen and (min-width: 720px) and (max-width: 1080px) {
+    grid-template-rows: 15% 70% 15%;
+  }
   .chat-header {
-    display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 2rem;
+    gap: 1rem;
     .user-details {
       display: flex;
       align-items: center;
       gap: 1rem;
       .avatar {
         img {
+          margin-left: 2vh;
+          margin-top: 1.5vh;
           height: 3rem;
         }
       }
@@ -162,14 +153,33 @@ const Container = styled.div`
           color: white;
         }
       }
+      button {
+        background-color: #997af0;
+        color: white;
+        padding: 1vh;
+        border: 0;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 0.8vh;
+
+        text-transform: uppercase;
+        margin-top: 3vh;
+
+        transition: 0.5s ease-ease-in-out;
+        &:hover {
+          background-color: #4e0eff;
+        }
+        margin-bottom: 3%;
+      }
     }
   }
   .chat-messages {
-    padding: 1rem 2rem;
+    padding: 2vh;
     display: flex;
     flex-direction: column;
     gap: 1rem;
     overflow: auto;
+    width: 100%;
     &::-webkit-scrollbar {
       width: 0.2rem;
       &-thumb {
@@ -182,15 +192,10 @@ const Container = styled.div`
       display: flex;
       align-items: center;
       .content {
-        max-width: 40%;
-        overflow-wrap: break-word;
-        padding: 1rem;
-        font-size: 1.1rem;
-        border-radius: 1rem;
+        padding: 2vh;
+        font-size: 2.5vh;
+        border-radius: 2vh;
         color: #d1d1d1;
-        @media screen and (min-width: 720px) and (max-width: 1080px) {
-          max-width: 70%;
-        }
       }
     }
     .sended {

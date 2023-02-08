@@ -1,10 +1,7 @@
 import React, {useDispatch, useSelector} from "react-redux";
 import {useEffect} from "react";
-
 import {logoutUser} from "../features/authSlice";
 import {useNavigate} from "react-router";
-import LogoutIcon from "@mui/icons-material/Logout";
-import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import {SettingsContainer} from "../components/ui/StyledSettings";
 
 const SettingsPage = (props) => {
@@ -29,7 +26,6 @@ const SettingsPage = (props) => {
         <button onClick={() => navigate("/account")}>Account</button>
         {auth._id ? (
           <button
-            endIcon={<LogoutIcon />}
             onClick={() => {
               dispatch(logoutUser(null));
             }}

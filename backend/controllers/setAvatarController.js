@@ -1,7 +1,13 @@
 const express = require("express");
 const model = require("../models/User");
-// Add a new users to the db
+const app = express();
+const bodyParser = require("body-parser");
 const router = express.Router();
+require("dotenv").config();
+
+require("dotenv").config();
+
+// Initialize routess
 
 router.get("/:id", async (req, res, next) => {
   const userId = {_id: req.params.id};

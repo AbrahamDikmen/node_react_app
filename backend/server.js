@@ -10,20 +10,23 @@ const app = express();
 
 require("dotenv").config();
 
-const server = require("http").createServer(app);
-const io = require("socket.io")(server, {
-  cors: {orgin: "*"},
-});
-
 // Initialize routess
+app.use(cookieParser());
+
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 app.use("/api", routes());
+app.use("/api/admin", routes());
 
 // error handling middleware
 app.use((err, req, res, next) => {
   res.status(422).send({error: err.message});
+});
+
+const server = require("http").createServer(app);
+const io = require("socket.io")(server, {
+  cors: {orgin: "*", credentials: true},
 });
 
 // DB Connection
@@ -32,6 +35,7 @@ const uri = process.env.ATLAS_URI;
 mongoose.connect(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  
 });
 
 // Check DB Connection
