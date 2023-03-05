@@ -20,7 +20,7 @@ export const SetAvatarPage = () => {
 
   useEffect(() => {
     const loadData = async () => {
-      await axios.get(`/api/setavatar/${auth._id}`).then((response) => {
+      await axios.get(`/api/user/setavatar/${auth._id}`).then((response) => {
         const data = response.data;
         if (data.isAvatarImageSet) {
           console.log(data);
@@ -37,7 +37,7 @@ export const SetAvatarPage = () => {
     if (selectedAvatar === "") {
       toast.error("Please select an avatar");
     } else {
-      const {data} = await axios.post(`/api/setavatar/${auth._id}`, {
+      const {data} = await axios.post(`/api/user/setavatar/${auth._id}`, {
         image: avatars[selectedAvatar],
       });
 

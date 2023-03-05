@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import {Container, Box, Input} from "@mui/material";
+import {Container, Box, Input, TextField} from "@mui/material";
 import {Button} from "@mui/material";
 
 export const ContactsContainer = styled(Container)`
@@ -93,4 +93,12 @@ export const ContactsContainer = styled(Container)`
       background-color: #4e0eff;
     }
   }
+`;
+export const ContactsBox = styled(Box)`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 5px 10px 5px 10px;
+  border-width: 5px;
 `;

@@ -1,213 +1,186 @@
-import React, {useState, useEffect, useRef} from "react";
+import React, {useState, useEffect} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import styled from "styled-components";
-import ChatInput from "./ChatInput";
-import {logoutUser} from "../features/authSlice";
-import {v4 as uuidv4} from "uuid";
+
 import axios from "axios";
-import HomePage from "../pages/HomePage";
+
 import {useNavigate} from "react-router";
 
-export default function ChatContainer({currentChat, socket}) {
-  const [messages, setMessages] = useState([]);
-  const scrollRef = useRef();
-  const [arrivalMessage, setArrivalMessage] = useState(null);
+import ChatLoading from "./ChatLoading";
+import {getSender} from "../config/ChatLogics";
+import {Button} from "@mui/material";
+
+import GroupChatModal from "./GroupChatModal";
+import AddIcon from "@mui/icons-material/Add";
+import {Box, Stack} from "@mui/material";
+export default function ChatContainer({
+  fetchAgain,
+  selectedChat,
+  setSelectedChat,
+  chats,
+  setChats,
+}) {
+  const [loggedUser, setLoggedUser] = useState();
 
   const auth = useSelector((state) => state.auth);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    const loadData = async () => {
-      await axios.get(`/api/setavatar/${auth._id}`).then(async (response) => {
-        const currentUser = response.data;
+  const fetchChats = async () => {
+    try {
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${auth.token}`,
+        },
+      };
+      const {data} = await axios.get(`/api/chat/${auth._id}`, config);
 
-        const data = await axios.post("/api/messages/getmsg", {
-          from: currentUser._id,
-          to: currentChat._id,
-        });
-        setMessages(data.data);
-      });
-    };
-    loadData();
-  }, [currentChat, auth._id]);
-
-  useEffect(() => {
-    const getCurrentChat = async () => {
-      await axios.get(`/api/setavatar/${auth._id}`).then(async (response) => {
-        const currentUser = response.data;
-
-        if (currentChat) {
-          await currentUser._id;
-        }
-      });
-    };
-    getCurrentChat();
-  }, [auth._id, currentChat]);
-
-  const handleSendMsg = async (msg) => {
-    await axios.get(`/api/setavatar/${auth._id}`).then(async (response) => {
-      const currentUser = response.data;
-
-      socket.current.emit("send-msg", {
-        to: currentChat._id,
-        from: currentUser._id,
-        msg,
-      });
-
-      await axios.post("/api/messages/addmsg", {
-        from: currentUser._id,
-        to: currentChat._id,
-        message: msg,
-      });
-
-      const msgs = [...messages];
-      msgs.push({fromSelf: true, message: msg});
-      setMessages(msgs);
-    });
+      setChats(data);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
-    if (socket.current) {
-      socket.current.on("msg-recieve", (msg) => {
-        console.log({msg});
-        setArrivalMessage({fromSelf: false, message: msg});
-      });
-    }
-  }, [socket]);
+    setLoggedUser(auth);
+    fetchChats();
 
-  useEffect(() => {
-    arrivalMessage && setMessages((prev) => [...prev, arrivalMessage]);
-  }, [arrivalMessage]);
-
-  useEffect(() => {
-    scrollRef.current?.scrollIntoView({behavior: "smooth"});
-  }, [messages]);
+    // eslint-disable-next-line
+  }, [fetchAgain]);
+  console.log(chats);
 
   return (
-    <Container>
-      <div className="chat-header">
-        <div className="user-details">
-          <div className="avatar">
-            <img
-              src={`data:image/svg+xml;base64,${currentChat.avatarImage}`}
-              alt=""
-            />
-          </div>
+    <>
+      <Container style={{display: selectedChat ? "none" : "flex"}}>
+        <div className="text"> My Chats </div>
 
-          <div className="username">
-            <h3>{currentChat.name}</h3>
-          </div>
-          <button onClick={() => navigate("/login")}>Home</button>
+        <GroupChatModal
+          setChats={setChats}
+          chats={chats}
+          selectedchastyle={{
+            display: "flex",
+          }}
+        >
+          <Button
+            endIcon={<AddIcon />}
+            style={{
+              display: "flex",
+              textAlign: "center",
+            }}
+          >
+            {" "}
+            New Group Chat
+          </Button>
+        </GroupChatModal>
+
+        <div className="bodyWrapper">
+          {chats ? (
+            <Stack sx={{overflowY: "scroll"}}>
+              {chats.map((chat) => (
+                <Box
+                  className="chat"
+                  onClick={() => setSelectedChat(chat)}
+                  key={chat._id}
+                >
+                  <div className="content">
+                    {!chat.isGroupChat
+                      ? getSender(loggedUser, chat.users)
+                      : chat.chatName}
+                  </div>
+
+                  {chat.latestMessage && (
+                    <div className="lastMessages">
+                      <b>{chat.latestMessage.sender.name} : </b>
+                      {chat.latestMessage.content.length > 50
+                        ? chat.latestMessage.content.substring(0, 51) + "..."
+                        : chat.latestMessage.content}
+                    </div>
+                  )}
+                </Box>
+              ))}
+            </Stack>
+          ) : (
+            <ChatLoading />
+          )}
         </div>
-      </div>
-
-      <div className="chat-messages">
-        {messages.map((message) => {
-          return (
-            <div ref={scrollRef} key={uuidv4()}>
-              <div
-                className={`message ${
-                  message.fromSelf ? "sended" : "recieved"
-                }`}
-              >
-                <div className="content ">
-                  <p>{message.message}</p>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      <ChatInput handleSendMsg={handleSendMsg} />
-    </Container>
+      </Container>
+    </>
   );
 }
 
-const Container = styled.div`
-  display: grid;
-  grid-template-rows: 10% 80% 10%;
-  overflow: hidden;
-  gap: 0.1rem;
-  @media screen and (min-width: 720px) and (max-width: 1080px) {
-    grid-template-rows: 15% 70% 15%;
+const Container = styled(Box)`
+  width: 100vw;
+  flex-direction: column;
+  align-items: center;
+  max-width: 33%;
+  background-color: white;
+  border-radius: 1rem;
+  border-width: 1px;
+
+  margin-right: 2vh;
+
+  .text {
+    margin: 2vh auto;
+    font-size: 4vh;
+    text-transform: uppercase;
+    font-family: Irish Grover;
+    color: #997af0;
   }
-  .chat-header {
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    .user-details {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      .avatar {
-        img {
-          margin-left: 2vh;
-          margin-top: 1.5vh;
-          height: 3rem;
-        }
-      }
-      .username {
-        h3 {
-          color: white;
-        }
-      }
-      button {
-        background-color: #997af0;
-        color: white;
-        padding: 1vh;
-        border: 0;
-        font-weight: bold;
-        cursor: pointer;
-        border-radius: 0.8vh;
 
-        text-transform: uppercase;
-        margin-top: 3vh;
+  button {
+    background-color: #997af0;
+    color: white;
 
-        transition: 0.5s ease-ease-in-out;
-        &:hover {
-          background-color: #4e0eff;
-        }
-        margin-bottom: 3%;
-      }
+    border: 0;
+    cursor: pointer;
+    border-radius: 0.8vh;
+    text-transform: uppercase;
+    margin-top: 2vh;
+    text-align: center;
+
+    transition: 0.5s ease-ease-in-out;
+    &:hover {
+      background-color: #4e0eff;
     }
+    margin-bottom: 3%;
   }
-  .chat-messages {
-    padding: 2vh;
+
+  .bodyWrapper {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    overflow: auto;
+
+    background-color: #f8f8f8;
     width: 100%;
-    &::-webkit-scrollbar {
-      width: 0.2rem;
-      &-thumb {
-        background-color: #ffffff39;
-        width: 0.1rem;
-        border-radius: 1rem;
+    height: 100%;
+    border-radius: 1vh;
+    overflow-y: hidden;
+
+    .chat {
+      cursor: pointer;
+      border-radius: 1vh;
+      margin-left: 2vh;
+      margin-right: 2vh;
+      background-color: #997af0;
+      color: white;
+      border: 0;
+      border-radius: 1rem;
+      margin-top: 1vh;
+      transition: 0.5s ease-ease-in-out;
+      &:hover {
+        background-color: #4e0eff;
       }
-    }
-    .message {
-      display: flex;
-      align-items: center;
       .content {
-        padding: 2vh;
-        font-size: 2.5vh;
-        border-radius: 2vh;
-        color: #d1d1d1;
+        margin-left: 1.5vh;
+        padding: 2px;
+        font-weight: bold;
       }
-    }
-    .sended {
-      justify-content: flex-end;
-      .content {
-        background-color: #4f04ff21;
-      }
-    }
-    .recieved {
-      justify-content: flex-start;
-      .content {
-        background-color: #9900ff20;
+
+      .lastMessages {
+        b {
+          font-weight: bold;
+          margin-top: 0.8vh;
+          color: black;
+          margin-left: 1.5vh;
+        }
       }
     }
   }

@@ -4,19 +4,19 @@ import {useNavigate} from "react-router";
 import styled from "styled-components";
 import axios from "axios";
 
-const FriendList = () => {
+const UserList = () => {
   const [currentUserName, setCurrentUserName] = useState("");
   const [currentUserImage, setCurrentUserImage] = useState("");
   const [currentUser, setCurrentUser] = useState("");
   const [contacts, setContacts] = useState([]);
-  const [value, setValue] = useState("");
+  const [addFriend, settAddFriend] = useState("");
 
   const auth = useSelector((state) => state.auth);
   const navigate = useNavigate();
 
   useEffect(() => {
     const loadData = async () => {
-      await axios.get(`/api/setavatar/${auth._id}`).then((response) => {
+      await axios.get(`/api/user/setavatar/${auth._id}`).then((response) => {
         const data = response.data;
         if (!data.isAvatarImageSet) {
           navigate("/setAvatar");
@@ -33,7 +33,7 @@ const FriendList = () => {
     const loadData = async () => {
       if (currentUser) {
         if (currentUser.isAvatarImageSet) {
-          const data = await axios.get(`/api/allusers/${currentUser._id}`);
+          const data = await axios.get(`/api/user/allusers/${currentUser._id}`);
           setContacts(data.data);
         }
       }
@@ -43,14 +43,19 @@ const FriendList = () => {
 
   const onChange = (e) => {
     e.preventDefault();
-    setValue(e.target.value);
+    settAddFriend(e.target.value);
   };
 
   const onSearch = (searchTerm) => {
-    setValue(searchTerm);
+    settAddFriend(searchTerm);
     console.log("Search", searchTerm);
   };
-  console.log(value);
+
+  const handleAddUser = () => {
+    const friendRequest = {addFriend};
+    settAddFriend(friendRequest);
+  };
+
   return (
     <>
       {currentUserImage && currentUserName && (
@@ -69,7 +74,7 @@ const FriendList = () => {
               <input
                 placeholder="Search user..."
                 type="text"
-                value={value}
+                value={addFriend}
                 variant="outlined"
                 onChange={onChange}
               />
@@ -77,7 +82,7 @@ const FriendList = () => {
               <div className="dropDown">
                 {contacts
                   .filter((item) => {
-                    const searchTerm = value.toLowerCase();
+                    const searchTerm = addFriend.toLowerCase();
                     const name = item.name.toLowerCase();
 
                     return searchTerm && name.startsWith(searchTerm);
@@ -182,13 +187,15 @@ const Container = styled.div`
           width: 100%;
 
           .dropDown-row {
+            padding: 0.5vh;
+            margin: 0.3vh auto;
             gap: 1vh;
             display: flex;
             align-items: center;
             text-align: center;
             margin: auto;
             background-color: #997af0;
-            min-height: 2vh;
+            min-height: 4vh;
             cursor: pointer;
             width: 90%;
             border-radius: 0.2rem;
@@ -202,8 +209,39 @@ const Container = styled.div`
             }
           }
         }
+        .addButton {
+          background-color: #997af0;
+          font-size: 2vh;
+          border-radius: 1vh;
+          padding: 1vh;
+          border: 0.2rem solid #4e0eff;
+          &:hover {
+            background-color: #4e0eff;
+          }
+        }
+      }
+    }
+    .buttonWrapper {
+      button {
+        background-color: #997af0;
+        color: white;
+        padding: 2vh;
+        border: 0;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 0.8vh;
+        font-size: 1rem;
+        text-transform: uppercase;
+        justify-content: center;
+        margin: 2vh;
+        text-align: center;
+        display: inline-block;
+        transition: 0.5s ease-ease-in-out;
+        &:hover {
+          background-color: #4e0eff;
+        }
       }
     }
   }
 `;
-export default FriendList;
+export default UserList;

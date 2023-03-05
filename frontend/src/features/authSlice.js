@@ -4,10 +4,11 @@ import axios from "axios";
 import jwtDecode from "jwt-decode";
 
 const initialState = {
+  _id: "",
   token: localStorage.getItem("token"),
   name: "",
   email: "",
-  _id: "",
+  isAdmin: "",
   registerStatus: "",
   registerError: "",
   loginStatus: "",
@@ -19,12 +20,22 @@ export const registerUser = createAsyncThunk(
   "auth/registerUser",
   async (user, {rejectWithValue}) => {
     try {
-      await axios.post("/api/register", {
-        name: user.name,
-        email: user.email,
-        password: user.password,
-        repeat_password: user.repeat_password,
-      });
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+        },
+      };
+      await axios.post(
+        "/api/user/register",
+        {
+          name: user.name,
+          email: user.email,
+          password: user.password,
+          repeat_password: user.repeat_password,
+          isAdmin: user.isAdmin,
+        },
+        config
+      );
     } catch (err) {
       console.log(err.response.data);
       return rejectWithValue(err.response.data);
@@ -36,10 +47,19 @@ export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async (user, {rejectWithValue}) => {
     try {
-      const token = await axios.post(`/api/auth/login`, {
-        name: user.name,
-        password: user.password,
-      });
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+        },
+      };
+      const token = await axios.post(
+        `/api/user/login`,
+        {
+          name: user.name,
+          password: user.password,
+        },
+        config
+      );
 
       localStorage.setItem("token", token.data);
 
@@ -74,14 +94,15 @@ const authSlice = createSlice({
     async logoutUser(state, action) {
       localStorage.removeItem("token");
 
-      await axios.post("/api/auth/logOut").then((response) => {
+      await axios.post("/api/user/logOut").then((response) => {
         return {
           response,
           ...state,
+          _id: "",
           token: "",
           name: "",
           email: "",
-          _id: "",
+          isAdmin: "",
           registerStatus: "",
           registerError: "",
           loginStatus: "",
@@ -118,10 +139,11 @@ const authSlice = createSlice({
         const user = jwtDecode(action.payload);
         return {
           ...state,
+          _id: user._id,
           token: action.payload,
           name: user.name,
           email: user.email,
-          _id: user._id,
+          isAdmin: "",
           loginStatus: "success",
         };
       } else return state;

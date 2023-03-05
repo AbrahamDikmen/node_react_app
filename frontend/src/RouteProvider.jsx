@@ -7,7 +7,7 @@ import LoginPage from "./pages/LoginPage.jsx";
 import HomePage from "./pages/HomePage.jsx";
 import NotFoundPage from "./pages/NotFoundPage";
 import SettingsPage from "./pages/SettingsPage";
-
+import Notification from "./components/Notification.jsx";
 import ForgottenPasswordPage from "./pages/ForgottenPasswordPage.jsx";
 import PasswordReset from "./pages/PasswordReset";
 import EmailVerify from "./pages/EmailVerify.jsx";
@@ -15,7 +15,7 @@ import EmailVerify from "./pages/EmailVerify.jsx";
 import AccountPage from "./pages/AccountPage.jsx";
 import SetAvatarPage from "./pages/SetAvatar";
 import ChatPage from "./pages/ChatPage.jsx";
-import FriendList from "./pages/FriendList.jsx";
+import UserList from "./pages/UserList.jsx";
 
 import TestStyledPage from "./pages/TestStyledPage.jsx";
 
@@ -47,7 +47,7 @@ const RouteProvider = () => {
           {/* Protected Routes from unlogged users */}
           <Route exact path="/" element={<ProtectedRoute />}>
             <Route path="/" exact element={<HomePage />} />
-
+            <Route path="/notifications" element={<Notification />} />
             {/* Chat Pages */}
             <Route path="/setavatar" element={<SetAvatarPage />} />
             <Route path="/chat" element={<ChatPage />} />
@@ -55,7 +55,7 @@ const RouteProvider = () => {
             {/* Seetings */}
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/account" element={<AccountPage />} />
-            <Route path="/friendList" element={<FriendList />} />
+            <Route path="/userList" element={<UserList />} />
           </Route>
         </Routes>
       </BrowserRouter>

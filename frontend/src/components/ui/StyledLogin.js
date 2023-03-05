@@ -1,6 +1,5 @@
 import styled from "styled-components";
-import {Container, Box, Input} from "@mui/material";
-import {Button} from "@mui/material";
+import {Container} from "@mui/material";
 
 export const LoginContainer = styled(Container)`
   margin: 10vh auto;

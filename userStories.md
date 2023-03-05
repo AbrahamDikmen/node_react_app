@@ -3,19 +3,19 @@
 [X].Lösenord ska vara minst 8 tecken långa och innehålla minst en stor bokstav, samt minst ett tecken som inte är någon bokstav. Detta ska kontrolleras både på frontend och på backend. (Notera även: Vid registrering ska användare ange lösenord 2 gånger och dessa ska matcha innan man får registrera sig.)
 
 ------------------Användare --------------------------
-[].En inloggad användare ska kunna: Se andra användare sorterade i namnordning och söka/filtrera bland dessa
-[].Skapa/påbörja en ny chat (med ämnesrubrik) och bjuda in andra användare till den.
-[].Se vilka chattar hen har blivit inbjuden till och välja att gå med i dessa.
-[].Se en lista över sina chattar, både de hen själv skapat och de hen gått med i efter inbjudan, och välja hur listan sorteras (efter ämnesrubrik, efter när hen själv skrev i den sist samt efter när någon skrev i den sist).
+[X].En inloggad användare ska kunna: Se andra användare sorterade i namnordning och söka/filtrera bland dessa
+[X].Skapa/påbörja en ny chat (med ämnesrubrik) och bjuda in andra användare till den.
+[X].Se vilka chattar hen har blivit inbjuden till och välja att gå med i dessa.
+[X].Se en lista över sina chattar, både de hen själv skapat och de hen gått med i efter inbjudan, och välja hur listan sorteras (efter ämnesrubrik, efter när hen själv skrev i den sist samt efter när någon skrev i den sist).
 [X].Skriva meddelanden i en chat och i ‘realtid’ se meddelanden andra skriver i den.
 [].Se om en administratör har stängt av dig från en chatt.
-[].“Blocka”/ta bort användare från en chat hen skapat/påbörjat.
+[X].“Blocka”/ta bort användare från en chat hen skapat/påbörjat.
 
 ------------------- Administratör --------------------
-[].Se alla chattar och deras innehåll
+[X].Se alla chattar och deras innehåll
 [].Ta bort enskilda chat-meddelande i valfri chat
-[].Skriva meddelanden/kommentarer i valfri chat och då ska de tydligt synas att dessa kommer från en admin.
-[].Blocka/stänga av valfri användare i valfri chat
+[X].Skriva meddelanden/kommentarer i valfri chat och då ska de tydligt synas att dessa kommer från en admin.
+[X].Blocka/stänga av valfri användare i valfri chat
 
 --------------------- Chatten---------------------------
 [X].Chattars ämnesrubrik och chatmeddelanden ska sparas i en databas. När man går med i en chat ska man kunna se chathistoriken.
@@ -29,7 +29,7 @@
 
 [X].Välj en databas. (T.ex. SQLite, MySQL, MariaDB, Postgres SQL, MongoDB). Som med övriga teknikval: Om du inte vill lägga tid på att lära dig något nytt, välj något du redan kan en del om.
 
-[].Skapa en REST-backend som har ACL-skydd så att routes bara kan nås av användare med rätt behörighet/användarroller. Använd whitelisting som princip.
+[X].Skapa en REST-backend som har ACL-skydd så att routes bara kan nås av användare med rätt behörighet/användarroller. Använd whitelisting som princip.
 
 [X].Skapa ett eget registrerings- och inlogningssystem. Cookies kopplade till sessioner ska användas. Sessioner ska sparas i databasen och systemet ska klara en omstart utan att inloggade användare slängs ut.
 

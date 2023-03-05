@@ -1,17 +1,30 @@
-const express = require("express");
+const asyncHandler = require("express-async-handler");
 
-const model = require("../models/User");
-const router = express.Router();
+const User = require("../models/userModel");
 
-router.get("/:id", async (req, res) => {
+const getUsers = asyncHandler(async (req, res) => {
   try {
-    const users = await model
-      .find({_id: {$ne: req.params.id}})
-      .select(["email", "name", "avatarImage", "_id"]);
+    const users = await User.find({_id: {$ne: req.params.id}}).select([
+      "email",
+      "name",
+      "avatarImage",
+      "_id",
+    ]);
     return res.json(users);
   } catch (ex) {
     next(ex);
   }
 });
 
-module.exports = router;
+// Update a users in the db
+const updateUsers = asyncHandler(async (req, res) => {
+  try {
+    let doc = await User.findByIdAndUpdate({_id: req.params.id}, req.body, {
+      new: true,
+    });
+    res.json(doc);
+  } catch (error) {
+    res.send({error});
+  }
+});
+module.exports = {getUsers, updateUsers};

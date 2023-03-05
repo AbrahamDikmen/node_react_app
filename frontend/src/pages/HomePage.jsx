@@ -1,16 +1,32 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, useRef} from "react";
 import {HomeContainer} from "../components/ui/StyledHome";
 import {useSelector} from "react-redux";
 import {useNavigate} from "react-router";
-import FriendList from "./FriendList";
 import axios from "axios";
 
 const HomePage = () => {
   const [currentUserName, setCurrentUserName] = useState("");
   const [currentUserImage, setCurrentUserImage] = useState("");
+  const [currentUser, setCurrentUser] = useState("");
+  const socket = useRef();
+
   const auth = useSelector((state) => state.auth);
   const navigate = useNavigate();
   console.log(auth.token);
+
+  useEffect(() => {
+    const loadData = async () => {
+      await axios.get(`/api/user/setavatar/${auth._id}`).then((response) => {
+        const data = response.data;
+        if (!data._id) {
+          navigate("/");
+        } else {
+          setCurrentUser(data);
+        }
+      });
+    };
+    loadData();
+  }, [auth._id, navigate]);
 
   const forceLogout = useEffect(() => {
     if (!auth._id) {
@@ -20,7 +36,7 @@ const HomePage = () => {
 
   useEffect(() => {
     const loadData = async () => {
-      await axios.get(`/api/setavatar/${auth._id}`).then((response) => {
+      await axios.get(`/api/user/setavatar/${auth._id}`).then((response) => {
         const data = response.data;
         if (!data.isAvatarImageSet) {
           navigate("/setAvatar");
@@ -31,6 +47,7 @@ const HomePage = () => {
     };
     loadData();
   }, [auth._id, navigate]);
+  console.log(socket);
   return (
     <>
       {currentUserImage && currentUserName && (
@@ -38,19 +55,23 @@ const HomePage = () => {
           <form>
             <h1>Chat Box</h1>
 
-            <div className="avatar">
-              <img
-                src={`data:image/svg+xml;base64,${currentUserImage}`}
-                alt="avatar"
-              />
+            <div className="body">
+              <div className="avatar">
+                <img
+                  src={`data:image/svg+xml;base64,${currentUserImage}`}
+                  alt="avatar"
+                />
+              </div>
+
+              <button onClick={() => navigate("/chat")}>Start Chat</button>
+              <button onClick={() => navigate("/userList")}>
+                Search users
+              </button>
+
+              {auth._id ? "" : forceLogout}
+
+              <button onClick={() => navigate("/settings")}>Settings</button>
             </div>
-
-            <button onClick={() => navigate("/chat")}>Start Chat</button>
-            <button onClick={() => navigate("/friendList")}>Friend List</button>
-
-            {auth._id ? "" : forceLogout}
-
-            <button onClick={() => navigate("/settings")}>Settings</button>
           </form>
         </HomeContainer>
       )}

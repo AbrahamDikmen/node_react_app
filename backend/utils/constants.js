@@ -4,4 +4,12 @@ module.exports = {
     moderator: "MODERATOR",
     client: "CLIENT",
   },
+
+  status: {
+    addFriend: "Send friend request",
+    requested: "Requested",
+    accept: "Accept",
+    friends: "Friends",
+    decline: "Decline",
+  },
 };

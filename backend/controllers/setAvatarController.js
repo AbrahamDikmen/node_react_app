@@ -1,22 +1,20 @@
-const express = require("express");
-const model = require("../models/User");
-const app = express();
+const asyncHandler = require("express-async-handler");
+const User = require("../models/userModel");
+
 const bodyParser = require("body-parser");
-const router = express.Router();
-require("dotenv").config();
 
 require("dotenv").config();
 
 // Initialize routess
 
-router.get("/:id", async (req, res, next) => {
+const getAvatar = asyncHandler(async (req, res) => {
   const userId = {_id: req.params.id};
   if (!userId) return res.status(400).send("Invalid id");
-  let doc = await model.findById(userId);
+  let doc = await User.findById(userId);
   res.json(doc);
 });
 
-router.post("/:id", async (req, res, next) => {
+const postAvatar = asyncHandler(async (req, res) => {
   try {
     const userId = {_id: req.params.id};
     if (!userId) return res.status(400).send("Invalid id");
@@ -24,7 +22,7 @@ router.post("/:id", async (req, res, next) => {
     const avatarImage = req.body.image;
     if (!avatarImage) return res.status(400).send("Invalid image");
 
-    const userData = await model.findByIdAndUpdate(
+    const userData = await User.findByIdAndUpdate(
       userId,
       {
         isAvatarImageSet: true,
@@ -41,4 +39,4 @@ router.post("/:id", async (req, res, next) => {
     res.send({error});
   }
 });
-module.exports = router;
+module.exports = {getAvatar, postAvatar};

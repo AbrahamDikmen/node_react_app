@@ -3,20 +3,23 @@ import axios from "axios";
 import {useNavigate} from "react-router-dom";
 import {useSelector} from "react-redux";
 import ChatContainer from "../components/ChatContainer";
-
+import Chatbox from "../components/ChatBox";
 import {ContainerChat} from "../components/ui/StyledChat";
-import Contacts from "../components/Contacts";
-import Welcome from "../components/Welcome";
+
 import io from "socket.io-client";
+import SideDrawler from "../components/SideDrawler";
 
 const ChatPage = () => {
   const navigate = useNavigate();
   const auth = useSelector((state) => state.auth);
   const socket = useRef();
-  const [contacts, setContacts] = useState([]);
-  const [currentChat, setCurrentChat] = useState("");
-  const [currentUser, setCurrentUser] = useState("");
+  const [selectedChat, setSelectedChat] = useState("");
 
+  const [currentUser, setCurrentUser] = useState("");
+  const [fetchAgain, setFetchAgain] = useState(false);
+
+  const [notification, setNotification] = useState([]);
+  const [chats, setChats] = useState([]);
   useEffect(() => {
     if (!auth._id) {
       navigate("/login");
@@ -24,7 +27,7 @@ const ChatPage = () => {
   }, [auth._id, navigate]);
   useEffect(() => {
     const loadData = async () => {
-      await axios.get(`/api/setavatar/${auth._id}`).then((response) => {
+      await axios.get(`/api/user/setavatar/${auth._id}`).then((response) => {
         const data = response.data;
         if (!data._id) {
           navigate("/");
@@ -44,35 +47,41 @@ const ChatPage = () => {
   }, [currentUser, socket]);
   console.log(socket);
 
-  useEffect(() => {
-    const loadData = async () => {
-      if (currentUser) {
-        if (currentUser.isAvatarImageSet) {
-          const data = await axios.get(`/api/allusers/${currentUser._id}`);
-          setContacts(data.data);
-        } else {
-          navigate("/setAvatar");
-        }
-      }
-    };
-    loadData();
-  }, [currentUser, navigate]);
-
-  const handleChatChange = (chat) => {
-    setCurrentChat(chat);
-  };
-
   return (
     <ContainerChat>
-      <h1>Chat Box</h1>
+      {auth && (
+        <SideDrawler
+          currentUser={currentUser}
+          setNotification={setNotification}
+          notification={notification}
+          chats={chats}
+          setChats={setChats}
+          setSelectedChat={setSelectedChat}
+          selectedChat={selectedChat}
+        />
+      )}
 
       <div className="container">
-        <Contacts contacts={contacts} changeChat={handleChatChange} />
+        {auth && (
+          <ChatContainer
+            chats={chats}
+            setChats={setChats}
+            socket={socket}
+            fetchAgain={fetchAgain}
+            setSelectedChat={setSelectedChat}
+            selectedChat={selectedChat}
+          />
+        )}
 
-        {currentChat === "" ? (
-          <Welcome />
-        ) : (
-          <ChatContainer currentChat={currentChat} socket={socket} />
+        {auth && (
+          <Chatbox
+            setNotification={setNotification}
+            notification={notification}
+            fetchAgain={fetchAgain}
+            setFetchAgain={setFetchAgain}
+            setSelectedChat={setSelectedChat}
+            selectedChat={selectedChat}
+          />
         )}
       </div>
     </ContainerChat>
