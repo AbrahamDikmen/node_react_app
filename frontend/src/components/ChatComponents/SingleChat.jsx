@@ -262,21 +262,20 @@ const SingleChat = ({
       ) : (
         <Box
           sx={{
-            display: "flex",
-            alignItems: "center",
+            width: "100",
+            margin: "5vh auto",
             justifyContent: "center",
-            height: "100%",
+            overflow: "hidden",
+            textAlign: "center",
           }}
         >
           <div
             style={{
-              fontSize: "3vh",
+              flexDirection: "colum",
               color: "#997af0",
             }}
           >
-            <h1>
-              Welcome <span>{auth.name}!</span>
-            </h1>
+            <h4> Welcome {auth.name}!</h4>
             <img src={Robot} alt="" />
             <h3>Please select a chat to Start messaging.</h3>
           </div>
