@@ -2,18 +2,19 @@ import {FormControl} from "@chakra-ui/form-control";
 import {Box, Button, InputBase} from "@mui/material";
 import Spinner from "@mui/material/CircularProgress";
 import {toast} from "react-toastify";
-import {getSender, getSenderFull} from "../config/ChatLogics";
+import {getSender, getSenderFull} from "../../config/ChatLogics";
 import {useEffect, useState} from "react";
 import axios from "axios";
 import {useSelector} from "react-redux";
-import ProfileModal from "./ProfileModel";
+import ProfileModal from "../UserComponents/ProfileModel";
 import Lottie from "react-lottie";
-import animationData from "../animations/typing.json";
+import animationData from "../../animations/typing.json";
 import io from "socket.io-client";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import UpdateGroupChat from "./UpdateGroupChat";
+import UpdateGroupChat from "../UserComponents/UpdateGroupChat";
 import ScrollChat from "./ScrollChat";
-import "./ui/styled.css";
+import "../ui/styled.css";
+import Robot from "../../assets/robot.gif";
 const ENDPOINT = "http://localhost:8080";
 let socket, selectedChatCompare;
 
@@ -273,7 +274,11 @@ const SingleChat = ({
               color: "#997af0",
             }}
           >
-            Click on a user to start chatting
+            <h1>
+              Welcome <span>{auth.name}!</span>
+            </h1>
+            <img src={Robot} alt="" />
+            <h3>Please select a chat to Start messaging.</h3>
           </div>
         </Box>
       )}

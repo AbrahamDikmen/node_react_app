@@ -7,8 +7,8 @@ const UserBadgeItem = ({user, handleFunction, admin}) => {
   return (
     <Box
       sx={{
-        width: "100%",
-        marginLeft: 1,
+        marginLeft: "10vh",
+        marginRight: "10vh",
         marginTop: "2vh",
         marginBottom: "2vh",
         backgroundColor: "#997af0",
@@ -23,17 +23,12 @@ const UserBadgeItem = ({user, handleFunction, admin}) => {
       }}
       onClick={handleFunction}
     >
-      <Stack>
-        <Button
-          style={{
-            color: "white",
-          }}
-          endIcon={<ClearIcon />}
-        >
+      <Box>
+        <Button sx={{color: "white"}} endIcon={<ClearIcon />}>
           {user.name}
           {admin === user._id && <span> (Admin)</span>}
         </Button>
-      </Stack>
+      </Box>
     </Box>
   );
 };

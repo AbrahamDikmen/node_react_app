@@ -8,7 +8,6 @@ const SettingsPage = (props) => {
   const auth = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  console.log(auth);
 
   const forceLogout = useEffect(() => {
     if (!auth._id) {

@@ -1,72 +1,49 @@
-import React, {useState, useRef} from "react";
+import React, {useState, useEffect} from "react";
 import {useSelector} from "react-redux";
 import {Box, InputBase, FormControl} from "@mui/material";
 import Modal from "@mui/material/Modal";
 import Button from "@mui/material/Button";
-import {toast} from "react-toastify";
-import UserBadgeItem from "../components/UserBadgeItem";
-import UserListItem from "../components/UserListItem";
+import UserBadgeItem from "../UserComponents/UserBadgeItem";
+import UserListItem from "../UserComponents/UserListItem";
 import axios from "axios";
 
 const GroupChatModal = ({children, setChats, chats}) => {
   const [open, setOpen] = useState(false);
   const [groupChatName, setGroupChatName] = useState("");
   const [selectedUsers, setSelectedUsers] = useState([]);
-  const [search, setSearch] = useState("");
-  const [searchResult, setSearchResult] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const auth = useSelector((state) => state.auth);
 
-  const style = {
-    m: "5vh auto",
-    bgcolor: "background.paper",
-    border: "2px solid #000",
-    boxShadow: 24,
-    p: 4,
-  };
+  const auth = useSelector((state) => state.auth);
+  const [contacts, setContacts] = useState([]);
+
+  const [addFriend, settAddFriend] = useState("");
 
   const handleGroup = (userToAdd) => {
     if (selectedUsers.includes(userToAdd)) {
-      toast({
-        title: "User already added",
-        status: "warning",
-        duration: 5000,
-        isClosable: true,
-        position: "top",
-      });
+      console.log("failed");
       return;
     }
 
     setSelectedUsers([...selectedUsers, userToAdd]);
   };
 
-  const handleSearch = async (query) => {
-    setSearch(query);
-    console.log(query);
-    if (!search) {
-      toast("Failed to Load the Search Results");
+  useEffect(() => {
+    const loadData = async () => {
+      if (auth._id) {
+        const data = await axios.get(`/api/user/allusers/${auth._id}`);
+        setContacts(data.data);
+      }
+    };
+    loadData();
+  }, [auth, auth._id]);
 
-      return;
-    }
-
-    try {
-      setLoading(true);
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${auth.token}`,
-        },
-      };
-
-      const {data} = await axios.get(`/api/user?search=${query}`, config);
-
-      setSearchResult(data);
-      setLoading(false);
-    } catch (error) {
-      toast("Failed to Load the Search Results");
-    }
+  const onChange = (e) => {
+    e.preventDefault();
+    settAddFriend(e.target.value);
   };
-
+  const onSearch = (searchTerm) => {
+    settAddFriend(searchTerm);
+    console.log("Search", searchTerm);
+  };
   const handleOpen = () => {
     setOpen(true);
   };
@@ -79,13 +56,7 @@ const GroupChatModal = ({children, setChats, chats}) => {
 
   const handleSubmit = async () => {
     if (!groupChatName || !selectedUsers) {
-      toast({
-        title: "Please fill all the feilds",
-        status: "warning",
-        duration: 5000,
-        isClosable: true,
-        position: "top",
-      });
+      console.log("error");
       return;
     }
 
@@ -104,17 +75,8 @@ const GroupChatModal = ({children, setChats, chats}) => {
         config
       );
       setChats([data, ...chats]);
-
-      toast("groupchat failed");
     } catch (error) {
-      toast({
-        title: "Failed to Create the Chat!",
-        description: error.response.data,
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
+      console.log(error);
     }
   };
 
@@ -124,14 +86,16 @@ const GroupChatModal = ({children, setChats, chats}) => {
       <Modal open={open}>
         <Box
           sx={{
-            ...style,
-            display: "flex",
-            width: "50%",
+            margin: "5vh auto",
+            width: "100%",
             justifyContent: "center",
             fontSize: "35px",
             overflow: "hidden",
             textAlign: "center",
-            flexDirection: "column",
+            padding: 3,
+            bgcolor: "background.paper",
+            border: "2px solid #000",
+            boxShadow: 24,
           }}
         >
           Create Group Chat
@@ -141,6 +105,15 @@ const GroupChatModal = ({children, setChats, chats}) => {
               flexDirection: "column",
             }}
           >
+            <Box sx={{width: "100%", flexDirection: "column-reverse"}}>
+              {selectedUsers.map((u) => (
+                <UserBadgeItem
+                  key={u._id}
+                  user={u}
+                  handleFunction={() => handleDelete(u)}
+                />
+              ))}
+            </Box>
             <FormControl>
               <InputBase
                 placeholder=" Chat Name"
@@ -159,8 +132,10 @@ const GroupChatModal = ({children, setChats, chats}) => {
                 }}
               />
             </FormControl>
+
             <FormControl>
               <InputBase
+                value={addFriend}
                 placeholder="Add Users eg: John, Piyush, Jane"
                 style={{
                   marginTop: "3vh",
@@ -174,31 +149,26 @@ const GroupChatModal = ({children, setChats, chats}) => {
                     outline: "none",
                   },
                 }}
-                onChange={(e) => handleSearch(e.target.value)}
+                onChange={onChange}
               />
             </FormControl>
-            <Box style={{width: "100%", display: "flex"}}>
-              {selectedUsers.map((u) => (
-                <UserBadgeItem
-                  key={u._id}
-                  user={u}
-                  handleFunction={() => handleDelete(u)}
-                />
-              ))}
-            </Box>
-            {loading ? (
-              <div>Loading...</div>
-            ) : (
-              searchResult
-                ?.slice(0, 4)
-                .map((user) => (
+            {contacts
+              .filter((item) => {
+                const searchTerm = addFriend.toLowerCase();
+                const name = item.name.toLowerCase();
+
+                return searchTerm && name.startsWith(searchTerm);
+              })
+              .slice(0, 4)
+              .map((user) => (
+                <div onClick={() => onSearch(user.name)}>
                   <UserListItem
                     key={user._id}
                     user={user}
                     handleFunction={() => handleGroup(user)}
                   />
-                ))
-            )}
+                </div>
+              ))}
 
             <Box>
               <Button

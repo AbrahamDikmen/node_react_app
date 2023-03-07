@@ -1,6 +1,6 @@
 require("dotenv").config();
-const router = require("express").Router();
-const model = require("../models/User");
+const asyncHandler = require("express-async-handler");
+const User = require("../models/userModel");
 const Token = require("../models/token");
 const crypto = require("crypto");
 const sendEmail = require("../utils/sendEmail");
@@ -9,7 +9,7 @@ const passwordComplexity = require("joi-password-complexity");
 const bcrypt = require("bcrypt");
 
 // send password link
-router.post("/", async (req, res) => {
+const sendLink = asyncHandler(async (req, res) => {
   try {
     const emailSchema = Joi.object({
       email: Joi.string().email().required().label("Email"),
@@ -18,7 +18,7 @@ router.post("/", async (req, res) => {
     const {error} = emailSchema.validate(req.body);
     if (error) return res.status(400).send({message: error.details[0].message});
 
-    let user = await model.findOne({email: req.body.email});
+    let user = await User.findOne({email: req.body.email});
     if (!user)
       return res
         .status(409)
@@ -44,9 +44,9 @@ router.post("/", async (req, res) => {
 });
 
 // verify password reset link
-router.get("/:id/:token", async (req, res) => {
+const verifyToken = asyncHandler(async (req, res) => {
   try {
-    const user = await model.findOne({_id: req.params.id});
+    const user = await User.findOne({_id: req.params.id});
     if (!user) return res.status(400).send({message: "Invalid link"});
 
     const token = await Token.findOne({
@@ -62,7 +62,7 @@ router.get("/:id/:token", async (req, res) => {
 });
 
 //  set new password
-router.post("/:id/:token", async (req, res) => {
+const setNewPassword = asyncHandler(async (req, res) => {
   try {
     const passwordSchema = Joi.object({
       password: passwordComplexity().required().label("Password"),
@@ -70,7 +70,7 @@ router.post("/:id/:token", async (req, res) => {
     const {error} = passwordSchema.validate(req.body);
     if (error) return res.status(400).send({message: error.details[0].message});
 
-    const user = await model.findOne({_id: req.params.id});
+    const user = await User.findOne({_id: req.params.id});
     if (!user) return res.status(400).send({message: "Invalid link"});
 
     const token = await Token.findOne({
@@ -95,4 +95,4 @@ router.post("/:id/:token", async (req, res) => {
   }
 });
 
-module.exports = router;
+module.exports = {sendLink, verifyToken, setNewPassword};

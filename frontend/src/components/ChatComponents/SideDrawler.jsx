@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import axios from "axios";
 import NotificationBadge from "react-notification-badge";
 import {Effect} from "react-notification-badge";
@@ -9,20 +9,19 @@ import {InputBase} from "@mui/material";
 import Stack from "@mui/material/Stack";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import Avatar from "@mui/material/Avatar";
-import {logoutUser} from "../features/authSlice";
-import {getSender} from "../config/ChatLogics";
+import {logoutUser} from "../../features/authSlice";
+import {getSender} from "../../config/ChatLogics";
 import {toast} from "react-toastify";
-import UserListItem from "../components/UserListItem";
+import UserListItem from "../UserComponents/UserListItem";
 import Spinner from "@mui/material/CircularProgress";
 import Drawer from "@mui/material/Drawer";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import ProfileModel from "./ProfileModel";
+import ProfileModel from "../UserComponents/ProfileModel";
 import PopupState, {bindTrigger, bindMenu} from "material-ui-popup-state";
-import ChatLoading from "./ChatLoading";
+
 import styled from "styled-components";
 
 const SideDrawer = ({
-  selectedChat,
   setSelectedChat,
   currentUser,
   chats,
@@ -32,16 +31,14 @@ const SideDrawer = ({
 }) => {
   const auth = useSelector((state) => state.auth);
 
-  const [search, setSearch] = useState("");
-  const [searchResult, setSearchResult] = useState([]);
-  const [loading, setLoading] = useState(false);
-
+  const [contacts, setContacts] = useState([]);
   const [loadingChat, setLoadingChat] = useState(false);
-
+  const [addFriend, settAddFriend] = useState("");
   const [anchorEl, setAnchorEl] = useState(false);
   const [open2, setOpen2] = useState(Boolean);
   const [open3, setOpen3] = useState(Boolean);
   const dispatch = useDispatch();
+
   const open = Boolean(anchorEl);
   const [state, setState] = useState({
     left: false,
@@ -82,33 +79,26 @@ const SideDrawer = ({
     dispatch(logoutUser(null));
   };
 
-  const handleSearch = async () => {
-    if (!search) {
-      toast("Failed to Load the Search Results");
-      return;
-    }
+  useEffect(() => {
+    const loadData = async () => {
+      if (currentUser) {
+        if (currentUser.isAvatarImageSet) {
+          const data = await axios.get(`/api/user/allusers/${currentUser._id}`);
+          setContacts(data.data);
+        }
+      }
+    };
+    loadData();
+  }, [auth._id, currentUser]);
 
-    try {
-      setLoading(true);
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${auth.token}`,
-        },
-      };
-
-      const {data} = await axios.get(`/api/user?search=${search}`, config);
-      setSearchResult(data);
-      setLoading(false);
-    } catch (error) {
-      toast("Failed to Load the Search Results");
-    }
-  };
   const onChange = (e) => {
     e.preventDefault();
-    setSearch(e.target.value);
+    settAddFriend(e.target.value);
   };
-
+  const onSearch = (searchTerm) => {
+    settAddFriend(searchTerm);
+    console.log("Search", searchTerm);
+  };
   const accessChat = async (userId) => {
     console.log(userId);
 
@@ -276,6 +266,7 @@ const SideDrawer = ({
               }}
             >
               <input
+                value={addFriend}
                 style={{
                   backGroundColor: "white",
                   border: 0,
@@ -289,41 +280,29 @@ const SideDrawer = ({
                   },
                 }}
                 placeholder="Search by name"
-                value={search}
                 onChange={onChange}
               />
-              <Button
-                style={{
-                  backgroundColor: "#997af0",
-                  color: "white",
-                  border: 0,
-                  fontWeight: "bold",
-                  textAlign: "center",
-                  marginRight: "1vh",
-                  fontSize: "1rem",
-                  marginBottom: "1vh",
-                  transition: "0.5s ease-ease-in-out",
-                  "&:hover": {
-                    backgroundColor: "#4e0eff",
-                  },
-                }}
-                onClick={handleSearch}
-              >
-                Go
-              </Button>
             </div>
 
-            {loading ? (
-              <ChatLoading />
-            ) : (
-              searchResult?.map((user) => (
-                <UserListItem
-                  key={user._id}
-                  user={user}
-                  handleFunction={() => accessChat(user._id)}
-                />
-              ))
-            )}
+            <div>
+              {contacts
+                .filter((item) => {
+                  const searchTerm = addFriend.toLowerCase();
+                  const name = item.name.toLowerCase();
+
+                  return searchTerm && name.startsWith(searchTerm);
+                })
+                .slice(0, 10)
+                .map((user) => (
+                  <div onClick={() => onSearch(user.name)}>
+                    <UserListItem
+                      key={user._id}
+                      user={user}
+                      handleFunction={() => accessChat(user._id)}
+                    />
+                  </div>
+                ))}
+            </div>
             {loadingChat && <Spinner style={{justifyContent: "flex-end"}} />}
           </Drawer>
         </div>

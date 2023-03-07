@@ -1,7 +1,6 @@
-import {Avatar} from "@chakra-ui/avatar";
-import {Box, Text} from "@mui/material";
+import {Box} from "@mui/material";
 import styled from "styled-components";
-import {useDispatch, useSelector} from "react-redux";
+
 const UserListItem = ({user, handleFunction}) => {
   return (
     <Box
@@ -47,47 +46,5 @@ const UserListItem = ({user, handleFunction}) => {
     </Box>
   );
 };
-const Container = styled.div`
-  cursor: pointer;
-  margin-top: 0;
-  display: flex;
-  text-align: center;
-  align-items: center;
-  color: white;
-  width: 80%;
-  align-items: center;
 
-  form {
-    margin-top: 2vh;
-    text-align: center;
-    background-color: #00000076;
-    border-radius: 2rem;
-
-    align-items: center;
-    height: 25vh;
-
-    margin-left: 2vh;
-    margin-right: 2vh;
-    text-align: center;
-    color: white;
-    &:hover {
-      background-color: #997af0;
-    }
-    h3 {
-      justify-content: space-between;
-
-      font-size: 3vh;
-      color: white;
-      text-transform: uppercase;
-      font-family: Irish Grover;
-    }
-
-    .avatar {
-      img {
-        margin-right: 2;
-        size: 2vh;
-      }
-    }
-  }
-`;
 export default UserListItem;

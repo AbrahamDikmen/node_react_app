@@ -13,6 +13,8 @@ const initialState = {
   registerError: "",
   loginStatus: "",
   loginError: "",
+  forgottenPasswordStatus: "",
+  forgottenPasswordError: "",
   userLoaded: false,
 };
 
@@ -71,6 +73,22 @@ export const loginUser = createAsyncThunk(
   }
 );
 
+export const passwordResetUser = createAsyncThunk(
+  "auth/passwordResetUser",
+  async (user, {rejectWithValue}) => {
+    try {
+      const token = await axios.post(`/api/password-reset`, {
+        email: user.email,
+      });
+      localStorage.setItem("token", token.data);
+
+      return token.data;
+    } catch (err) {
+      console.log(err.response.data);
+      return rejectWithValue(err.response.data);
+    }
+  }
+);
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -153,6 +171,30 @@ const authSlice = createSlice({
         ...state,
         loginStatus: "rejected",
         loginError: action.payload,
+      };
+    });
+
+    // forgotten password
+    builder.addCase(passwordResetUser.pending, (state, action) => {
+      return {...state, forgottenPasswordStatus: "pending"};
+    });
+    builder.addCase(passwordResetUser.fulfilled, (state, action) => {
+      if (action.payload) {
+        const user = jwtDecode(action.payload);
+        return {
+          ...state,
+          token: action.payload,
+          email: user.email,
+          _id: user._id,
+          forgottenPasswordStatus: "success",
+        };
+      } else return state;
+    });
+    builder.addCase(passwordResetUser.rejected, (state, action) => {
+      return {
+        ...state,
+        forgottenPasswordStatus: "rejected",
+        forgottenPasswordError: action.payload,
       };
     });
   },

@@ -9,7 +9,7 @@ const EmailVerify = () => {
   useEffect(() => {
     const verifyEmailUrl = async () => {
       try {
-        const url = `http://localhost:8080/api/users/${param.id}/verify/${param.token}`;
+        const url = `api/password-reset/${param.id}/verify/${param.token}`;
         const {data} = await axios.get(url);
         console.log(data);
         setValidUrl(true);

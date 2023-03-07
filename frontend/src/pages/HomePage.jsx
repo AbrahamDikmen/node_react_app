@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from "react";
+import React, {useEffect, useState} from "react";
 import {HomeContainer} from "../components/ui/StyledHome";
 import {useSelector} from "react-redux";
 import {useNavigate} from "react-router";
@@ -8,11 +8,9 @@ const HomePage = () => {
   const [currentUserName, setCurrentUserName] = useState("");
   const [currentUserImage, setCurrentUserImage] = useState("");
   const [currentUser, setCurrentUser] = useState("");
-  const socket = useRef();
 
   const auth = useSelector((state) => state.auth);
   const navigate = useNavigate();
-  console.log(auth.token);
 
   useEffect(() => {
     const loadData = async () => {
@@ -47,7 +45,7 @@ const HomePage = () => {
     };
     loadData();
   }, [auth._id, navigate]);
-  console.log(socket);
+
   return (
     <>
       {currentUserImage && currentUserName && (
@@ -64,9 +62,6 @@ const HomePage = () => {
               </div>
 
               <button onClick={() => navigate("/chat")}>Start Chat</button>
-              <button onClick={() => navigate("/userList")}>
-                Search users
-              </button>
 
               {auth._id ? "" : forceLogout}
 

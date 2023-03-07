@@ -1,13 +1,9 @@
 import React, {useState, useEffect} from "react";
-import {useDispatch, useSelector} from "react-redux";
+import {useSelector} from "react-redux";
 import styled from "styled-components";
-
 import axios from "axios";
-
-import {useNavigate} from "react-router";
-
 import ChatLoading from "./ChatLoading";
-import {getSender} from "../config/ChatLogics";
+import {getSender} from "../../config/ChatLogics";
 import {Button} from "@mui/material";
 
 import GroupChatModal from "./GroupChatModal";
@@ -19,6 +15,7 @@ export default function ChatContainer({
   setSelectedChat,
   chats,
   setChats,
+  contacts,
 }) {
   const [loggedUser, setLoggedUser] = useState();
 
@@ -53,22 +50,10 @@ export default function ChatContainer({
       <Container style={{display: selectedChat ? "none" : "flex"}}>
         <div className="text"> My Chats </div>
 
-        <GroupChatModal
-          setChats={setChats}
-          chats={chats}
-          selectedchastyle={{
-            display: "flex",
-          }}
-        >
-          <Button
-            endIcon={<AddIcon />}
-            style={{
-              display: "flex",
-              textAlign: "center",
-            }}
-          >
+        <GroupChatModal setChats={setChats} chats={chats} s>
+          <Button endIcon={<AddIcon />}>
             {" "}
-            New Group Chat
+            <h4> New Group Chat </h4>
           </Button>
         </GroupChatModal>
 
@@ -76,12 +61,13 @@ export default function ChatContainer({
           {chats ? (
             <Stack sx={{overflowY: "scroll"}}>
               {chats.map((chat) => (
-                <Box
+                <Button
                   className="chat"
                   onClick={() => setSelectedChat(chat)}
                   key={chat._id}
                 >
                   <div className="content">
+                    {" "}
                     {!chat.isGroupChat
                       ? getSender(loggedUser, chat.users)
                       : chat.chatName}
@@ -89,13 +75,15 @@ export default function ChatContainer({
 
                   {chat.latestMessage && (
                     <div className="lastMessages">
-                      <b>{chat.latestMessage.sender.name} : </b>
-                      {chat.latestMessage.content.length > 50
-                        ? chat.latestMessage.content.substring(0, 51) + "..."
-                        : chat.latestMessage.content}
+                      <div className="sender">
+                        {chat.latestMessage.sender.name}: {""}
+                        {chat.latestMessage.content.length > 50
+                          ? chat.latestMessage.content.substring(0, 51) + "..."
+                          : chat.latestMessage.content}
+                      </div>
                     </div>
                   )}
-                </Box>
+                </Button>
               ))}
             </Stack>
           ) : (
@@ -108,19 +96,17 @@ export default function ChatContainer({
 }
 
 const Container = styled(Box)`
-  width: 100vw;
+  width: 100%;
   flex-direction: column;
   align-items: center;
   max-width: 33%;
   background-color: white;
   border-radius: 1rem;
-  border-width: 1px;
-
-  margin-right: 2vh;
+  margin-right: 1vh;
 
   .text {
-    margin: 2vh auto;
-    font-size: 4vh;
+    margin: 1vh auto;
+    font-size: 1.5rem;
     text-transform: uppercase;
     font-family: Irish Grover;
     color: #997af0;
@@ -129,7 +115,6 @@ const Container = styled(Box)`
   button {
     background-color: #997af0;
     color: white;
-
     border: 0;
     cursor: pointer;
     border-radius: 0.8vh;
@@ -142,12 +127,13 @@ const Container = styled(Box)`
       background-color: #4e0eff;
     }
     margin-bottom: 3%;
+
+    h4 {
+      font-size: 1.3vh;
+    }
   }
 
   .bodyWrapper {
-    display: flex;
-    flex-direction: column;
-
     background-color: #f8f8f8;
     width: 100%;
     height: 100%;
@@ -155,31 +141,19 @@ const Container = styled(Box)`
     overflow-y: hidden;
 
     .chat {
-      cursor: pointer;
-      border-radius: 1vh;
-      margin-left: 2vh;
-      margin-right: 2vh;
-      background-color: #997af0;
-      color: white;
-      border: 0;
-      border-radius: 1rem;
-      margin-top: 1vh;
-      transition: 0.5s ease-ease-in-out;
-      &:hover {
-        background-color: #4e0eff;
-      }
+      flex-direction: column;
+      margin-left: 1vh;
+      margin-right: 1vh;
+
       .content {
-        margin-left: 1.5vh;
-        padding: 2px;
+        display: flex;
         font-weight: bold;
       }
-
       .lastMessages {
-        b {
+        .sender {
           font-weight: bold;
           margin-top: 0.8vh;
           color: black;
-          margin-left: 1.5vh;
         }
       }
     }

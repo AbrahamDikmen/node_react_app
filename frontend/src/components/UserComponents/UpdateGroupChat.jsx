@@ -2,14 +2,14 @@ import {FormControl} from "@chakra-ui/form-control";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import Modal from "@mui/material/Modal";
 import axios from "axios";
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import {toast} from "react-toastify";
-import UserBadgeItem from "../components/UserBadgeItem";
-import UserListItem from "../components/UserListItem";
+import UserBadgeItem from "./UserBadgeItem";
+import UserListItem from "./UserListItem";
 import {useSelector} from "react-redux";
 import {Box, Button, InputBase} from "@mui/material";
 import Spinner from "@mui/material/CircularProgress";
-
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 const UpdateGroupChatModal = ({
   fetchMessages,
   fetchAgain,
@@ -17,24 +17,25 @@ const UpdateGroupChatModal = ({
   setSelectedChat,
   selectedChat,
 }) => {
+  const [contacts, setContacts] = useState([]);
+
+  const [addFriend, settAddFriend] = useState("");
   const [groupChatName, setGroupChatName] = useState();
-  const [search, setSearch] = useState("");
+
   const [searchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
   const [renameloading, setRenameLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const auth = useSelector((state) => state.auth);
 
-  // const {isOpen, onOpen, onClose} = useDisclosure();
-
-  const style = {
-    m: "14vh auto",
-    bgcolor: "background.paper",
-    border: "2px solid #000",
-    boxShadow: 24,
-    p: 4,
+  const onChange = (e) => {
+    e.preventDefault();
+    settAddFriend(e.target.value);
   };
-
+  const onSearch = (searchTerm) => {
+    settAddFriend(searchTerm);
+    console.log("Search", searchTerm);
+  };
   const handleOpen = () => {
     setOpen(true);
   };
@@ -42,28 +43,15 @@ const UpdateGroupChatModal = ({
     setOpen(false);
   };
 
-  const handleSearch = async (query) => {
-    setSearch(query);
-    if (!query) {
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const config = {
-        headers: {
-          Authorization: `Bearer ${auth.token}`,
-        },
-      };
-      const {data} = await axios.get(`/api/user?search=${search}`, config);
-      console.log(data);
-      setLoading(false);
-      setSearchResult(data);
-    } catch (error) {
-      toast(error);
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    const loadData = async () => {
+      if (auth._id) {
+        const data = await axios.get(`/api/user/allusers/${auth._id}`);
+        setContacts(data.data);
+      }
+    };
+    loadData();
+  }, [auth, auth._id]);
 
   const handleRename = async () => {
     if (!groupChatName) return;
@@ -177,16 +165,23 @@ const UpdateGroupChatModal = ({
       <Modal open={open}>
         <Box
           sx={{
-            ...style,
-            display: "flex",
-            width: "50%",
+            margin: "5vh auto",
+            width: "100%",
             justifyContent: "center",
             fontSize: "35px",
             overflow: "hidden",
             textAlign: "center",
-            flexDirection: "column",
+            padding: 3,
+            bgcolor: "background.paper",
+            border: "2px solid #000",
+            boxShadow: 24,
           }}
         >
+          <Button
+            style={{display: "flex"}}
+            endIcon={<ArrowBackIcon />}
+            onClick={() => handleClose()}
+          />
           <Box>{selectedChat.chatName}</Box>
 
           <Box
@@ -223,30 +218,35 @@ const UpdateGroupChatModal = ({
               <Button
                 variant="solid"
                 color="teal"
-                // onLoadedData={renameloading}
+                isLoading={renameloading}
                 onClick={handleRename}
               >
                 Update
               </Button>
             </FormControl>
             <FormControl>
-              <InputBase
-                placeholder="Add User to group"
-                onChange={(e) => handleSearch(e.target.value)}
-              />
+              <InputBase placeholder="Add User to group" onChange={onChange} />
             </FormControl>
 
-            {loading ? (
-              <Spinner />
-            ) : (
-              searchResult?.map((user) => (
-                <UserListItem
-                  key={user._id}
-                  user={user}
-                  handleFunction={() => handleAddUser(user)}
-                />
-              ))
-            )}
+            <div>
+              {contacts
+                .filter((item) => {
+                  const searchTerm = addFriend.toLowerCase();
+                  const name = item.name.toLowerCase();
+
+                  return searchTerm && name.startsWith(searchTerm);
+                })
+                .slice(0, 10)
+                .map((user) => (
+                  <div onClick={() => onSearch(user.name)}>
+                    <UserListItem
+                      key={user._id}
+                      user={user}
+                      handleFunction={() => handleAddUser(user)}
+                    />
+                  </div>
+                ))}
+            </div>
           </Box>
           <Box>
             <Button onClick={() => handleRemove(auth)}>Leave Group</Button>

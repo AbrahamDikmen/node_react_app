@@ -20,15 +20,26 @@ export const PasswordResetContainer = styled(Container)`
     h1 {
       margin-top: 3vh;
       color: white;
+      font-size: 3vh;
       text-transform: uppercase;
       font-family: Irish Grover;
     }
-
-    .avatar {
-      img {
-        height: 20vh;
+    input {
+      margin-bottom: 2vh;
+      margin-top: 3vh;
+      background-color: transparent;
+      padding: 2vh;
+      border: 0.1rem solid #4e0eff;
+      border-radius: 0.4rem;
+      color: white;
+      width: 60%;
+      font-size: 1rem;
+      &:focus {
+        border: 0.1rem solid #997af0;
+        outline: none;
       }
     }
+
     button {
       background-color: #997af0;
       color: white;

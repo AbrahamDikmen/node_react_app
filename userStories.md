@@ -14,7 +14,7 @@
 ------------------- Administratör --------------------
 [X].Se alla chattar och deras innehåll
 [].Ta bort enskilda chat-meddelande i valfri chat
-[X].Skriva meddelanden/kommentarer i valfri chat och då ska de tydligt synas att dessa kommer från en admin.
+[].Skriva meddelanden/kommentarer i valfri chat och då ska de tydligt synas att dessa kommer från en admin.
 [X].Blocka/stänga av valfri användare i valfri chat
 
 --------------------- Chatten---------------------------

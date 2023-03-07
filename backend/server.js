@@ -5,9 +5,7 @@ const cookieParser = require("cookie-parser");
 const usersRoutes = require("./routes/usersRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const messageRoutes = require("./routes/messageRoutes");
-// const {notFound, errorHandler} = require("./middleware/errorMiddleware");
-// Sett up express app
-
+const passwordRoutes = require("./routes/passwordResetController");
 const app = express();
 
 require("dotenv").config();
@@ -18,10 +16,10 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
+app.use("/api/password-reset", passwordRoutes);
 app.use("/api/user", usersRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/message", messageRoutes);
-// app.use("/api/admin", routes());
 
 // error handling middleware
 app.use((err, req, res, next) => {

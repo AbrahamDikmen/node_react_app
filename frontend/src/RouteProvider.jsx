@@ -1,13 +1,12 @@
 import React from "react";
 import {BrowserRouter, Routes, Route} from "react-router-dom";
 import ProtectedRoute from "./features/protectionRoutes/ProtectedRoute.jsx";
-
 import RegisterPage from "./pages/RegisterPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import HomePage from "./pages/HomePage.jsx";
 import NotFoundPage from "./pages/NotFoundPage";
 import SettingsPage from "./pages/SettingsPage";
-import Notification from "./components/Notification.jsx";
+import Notification from "./components/UserComponents/Notification.jsx";
 import ForgottenPasswordPage from "./pages/ForgottenPasswordPage.jsx";
 import PasswordReset from "./pages/PasswordReset";
 import EmailVerify from "./pages/EmailVerify.jsx";
@@ -15,7 +14,6 @@ import EmailVerify from "./pages/EmailVerify.jsx";
 import AccountPage from "./pages/AccountPage.jsx";
 import SetAvatarPage from "./pages/SetAvatar";
 import ChatPage from "./pages/ChatPage.jsx";
-import UserList from "./pages/UserList.jsx";
 
 import TestStyledPage from "./pages/TestStyledPage.jsx";
 
@@ -30,9 +28,11 @@ const RouteProvider = () => {
           <Route path="/login" element={<LoginPage />} />
 
           {/* Forgot Password, Find User, Reset Password*/}
+          <Route path="/users/:id/verify/:token" element={<EmailVerify />} />
+          <Route path="/forgot-password" element={<ForgottenPasswordPage />} />
           <Route
-            path="/api/users/:id/verify/:token"
-            element={<EmailVerify />}
+            path="/password-reset/:id/:token"
+            element={<PasswordReset />}
           />
           <Route
             path="/api/forgot-password"
@@ -55,7 +55,6 @@ const RouteProvider = () => {
             {/* Seetings */}
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/account" element={<AccountPage />} />
-            <Route path="/userList" element={<UserList />} />
           </Route>
         </Routes>
       </BrowserRouter>

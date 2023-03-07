@@ -9,7 +9,7 @@ import {
   isSameSender,
   isSameSenderMargin,
   isSameUser,
-} from "../config/ChatLogics";
+} from "../../config/ChatLogics";
 
 const ScrollChat = ({messages}) => {
   const auth = useSelector((state) => state.auth);
